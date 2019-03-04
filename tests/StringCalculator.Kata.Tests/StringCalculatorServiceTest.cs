@@ -71,6 +71,14 @@ namespace StringCalculator.Kata.Tests
         }
 
         [TestMethod]
+        public void should_return_result_addition_when_user_change_delimiter_with_multiple_caracters()
+        {
+            var numbers = "//[***]\n1***2***3";
+            var result = _stringCalculatorService.Add(numbers);
+            Assert.AreEqual(6, result);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException), "Negatives are not allowed (-3)")]
         public void should_return_exception_when_string_contains_negatives_numbers()
         {
@@ -84,6 +92,14 @@ namespace StringCalculator.Kata.Tests
         {
             var numbers = "1,2,-3,-4";
             _stringCalculatorService.Add(numbers);
+        }
+
+        [TestMethod]
+        public void should_ignore_number_more_than_1000_and_add_others()
+        {
+            var numbers = "1,2,1002";
+            var result = _stringCalculatorService.Add(numbers);
+            Assert.AreEqual(3, result);
         }
     }
 }

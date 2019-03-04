@@ -15,27 +15,29 @@ namespace StringCalculator.Kata.Services
                 var numbersWithoutNewLine = numbers.Replace("//", "\n");
                 var resultSplit = numbersWithoutNewLine.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                char delimiter;
-                var isParse = char.TryParse(resultSplit[0], out delimiter);
-                if (!isParse) throw new ArgumentException("Numbers format with delimiter is not correct");
+                var delimiter = resultSplit[0];
+                if (resultSplit[0].Contains("["))
+                {
+                    delimiter = resultSplit[0].Replace("[", "").Replace("]", "");
+                }
 
-                var numbersJoin = string.Join(delimiter.ToString(), resultSplit[1]);
+                var numbersJoin = string.Join(delimiter, resultSplit[1]);
                 return SumStringWithCommas(numbersJoin, delimiter);
             }
 
             if (numbers.Contains("\n") || numbers.Contains(","))
             {
                 var numbersWithoutNewLine = numbers.Replace("\n", ",");
-                return SumStringWithCommas(numbersWithoutNewLine, ',');
+                return SumStringWithCommas(numbersWithoutNewLine, ",");
             }
 
             return string.IsNullOrEmpty(numbers) ? 0 : Convert.ToInt32(numbers);
         }
 
-        private static int SumStringWithCommas(string numbers, char delimiter)
+        private static int SumStringWithCommas(string numbers, string delimiter)
         {
-            var numbersSplit = numbers.Split(delimiter);
-            return numbersSplit.Select(x => Convert.ToInt32(x)).Sum();
+            var numbersSplit = numbers.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+            return numbersSplit.Select(x => Convert.ToInt32(x)).Where(x => x <= 1000).Sum();
         }
 
         private static void CheckErrors(string numbers)
