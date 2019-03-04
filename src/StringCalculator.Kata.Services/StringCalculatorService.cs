@@ -12,17 +12,18 @@ namespace StringCalculator.Kata.Services
 
             if (numbers.Contains("//") && numbers.Contains("\n"))
             {
-                var newString = numbers.Replace("//", "\n");
-                var result = newString.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var numbersWithoutNewLine = numbers.Replace("//", "\n");
+                var resultSplit = numbersWithoutNewLine.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
                 char delimiter;
-                var isParse = char.TryParse(result[0], out delimiter);
-                if(isParse)
-                {
-                    var allnumbers = string.Join(delimiter.ToString(), result[1]);
-                    return SumStringWithCommas(allnumbers, delimiter);
-                }
+                var isParse = char.TryParse(resultSplit[0], out delimiter);
+                if (!isParse) throw new ArgumentException("Numbers format with delimiter is not correct");
+
+                var numbersJoin = string.Join(delimiter.ToString(), resultSplit[1]);
+                return SumStringWithCommas(numbersJoin, delimiter);
             }
-            else if (numbers.Contains("\n") || numbers.Contains(","))
+
+            if (numbers.Contains("\n") || numbers.Contains(","))
             {
                 var numbersWithoutNewLine = numbers.Replace("\n", ",");
                 return SumStringWithCommas(numbersWithoutNewLine, ',');
@@ -33,8 +34,8 @@ namespace StringCalculator.Kata.Services
 
         private static int SumStringWithCommas(string numbers, char delimiter)
         {
-            var allnumbers = numbers.Split(delimiter);
-            return allnumbers.Select(x => Convert.ToInt32(x)).Sum();
+            var numbersSplit = numbers.Split(delimiter);
+            return numbersSplit.Select(x => Convert.ToInt32(x)).Sum();
         }
 
         private static void CheckErrors(string numbers)
@@ -43,17 +44,14 @@ namespace StringCalculator.Kata.Services
             {
                 throw new ArgumentException("\n, is not authorized");
             }
-            else
-            {
-                var regex = new Regex(@"-[0-9]");
-                MatchCollection matches = regex.Matches(numbers);
-                if (matches.Count > 0)
-                {
-                    var negativeNumbers = matches.Cast<Match>().Select(x => x.Value);
-                    var result = string.Join(",", negativeNumbers);
-                    throw new ArgumentException($"Negatives are not allowed (result)");
-                }
-            }
+
+            var regex = new Regex(@"-[0-9]");
+            var matches = regex.Matches(numbers);
+            if (matches.Count <= 0) return;
+
+            var negativeNumbers = matches.Cast<Match>().Select(x => x.Value);
+            var result = string.Join(",", negativeNumbers);
+            throw new ArgumentException($"Negatives are not allowed ({result})");
         }
     }
 }
